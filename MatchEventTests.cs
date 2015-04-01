@@ -83,30 +83,26 @@ namespace BT_Sport_Server_Tests.Opta
         }
 
         [TestMethod]
-        public void RugbyGoalMatchEventTests()
+        public void RugbyTryMatchEventTests()
         {
-            Goal goal = XmlHandler.DeserializeFile<Goal>(filePath + "f50-98-2014-741613-1651683701-goal[20140908-012546].xml", new XmlRootAttribute { ElementName = "RU50_EventFeed" });
+            Goal goal = XmlHandler.DeserializeFile<Goal>(filePath + "RU50-201-2015-115183-3070195[20150329-161257].xml", new XmlRootAttribute { ElementName = "RU50_EventFeed" });
 
             // Event
-            Assert.AreEqual(Convert.ToDateTime("2014-09-08 01:26:05"), goal.Timestamp);
-            Assert.AreEqual(741613, goal.MatchID);
-            Assert.AreEqual(1651683701, goal.EventID);
+            Assert.AreEqual(Convert.ToDateTime("2015-03-29 16:14:47"), goal.Timestamp);
+            Assert.AreEqual(115183, goal.MatchID);
+            Assert.AreEqual(3070195, goal.EventID);
             Assert.AreEqual(2, goal.Period);
-            Assert.AreEqual(59, goal.Min);
-            Assert.AreEqual(52, goal.Sec);
-            Assert.AreEqual(60, goal.Time);
-            Assert.AreEqual(928, goal.TeamID);
-            Assert.AreEqual("goal", goal.EventType);
+            Assert.AreEqual(66, goal.Min);
+            Assert.AreEqual(29, goal.Sec);
+            Assert.AreEqual(67, goal.Time);
+            Assert.AreEqual(1000, goal.TeamID);
+            Assert.AreEqual("Try", goal.EventType);
 
             // Goal
-            Assert.AreEqual(42532, goal.PlayerScorerID);
-            Assert.AreEqual(17152, goal.PlayerAssistID);
-            Assert.AreEqual("right footed", goal.BodyPart);
-            Assert.AreEqual("goal", goal.GoalType);
-            Assert.AreEqual(true, goal.OnTarget);
-            Assert.AreEqual(2, goal.HomeScore);
-            Assert.AreEqual(1, goal.AwayScore);
-            Assert.AreEqual("Box, Right", goal.ScoringRange);
+            Assert.AreEqual(9877, goal.PlayerScorerID);
+            Assert.AreEqual("Try", goal.GoalType);
+            Assert.AreEqual(7, goal.HomeScore);
+            Assert.AreEqual(36, goal.AwayScore);
         }
 
         [TestMethod]
@@ -134,23 +130,22 @@ namespace BT_Sport_Server_Tests.Opta
         [TestMethod]
         public void RugbyCardMatchEventTest()
         {
-            Card card = XmlHandler.DeserializeFile<Card>(filePath + "f50-98-2015-791409-264392395-card[20150330-013755].xml", new XmlRootAttribute { ElementName = "RU50_EventFeed" });
+            Card card = XmlHandler.DeserializeFile<Card>(filePath + "RU50-201-2015-115183-3070207[20150329-162711].xml", new XmlRootAttribute { ElementName = "RU50_EventFeed" });
 
             // Event
-            Assert.AreEqual(Convert.ToDateTime("2015-03-30 01:41:18"), card.Timestamp);
-            Assert.AreEqual(791409, card.MatchID);
-            Assert.AreEqual(264392395, card.EventID);
-            Assert.AreEqual(66, card.Min);
-            Assert.AreEqual(51, card.Sec);
-            Assert.AreEqual(67, card.Time);
-            Assert.AreEqual(2077, card.TeamID);
+            Assert.AreEqual(Convert.ToDateTime("2015-03-29 16:30:32"), card.Timestamp);
+            Assert.AreEqual(115183, card.MatchID);
+            Assert.AreEqual(3070207, card.EventID);
+            Assert.AreEqual(79, card.Min);
+            Assert.AreEqual(54, card.Sec);
+            Assert.AreEqual(80, card.Time);
+            Assert.AreEqual(78, card.TeamID);
             Assert.AreEqual(2, card.Period);
-            Assert.AreEqual("card", card.EventType);
+            Assert.AreEqual("Card", card.EventType);
 
             // Card
-            Assert.AreEqual("yellow", card.CardType);
-            Assert.AreEqual("foul", card.Reason);
-            Assert.AreEqual(207760, card.PlayerID);
+            Assert.AreEqual("Yellow", card.CardType);
+            Assert.AreEqual(1475, card.PlayerID);
         }
     }
 }

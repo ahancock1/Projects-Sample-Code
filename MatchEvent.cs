@@ -201,6 +201,7 @@ namespace BT_Sport_Server.Opta
             Sec = Convert.ToInt32(reader["period_second"]);
             Time = Min + 1;
             PlayerID = Convert.ToInt32(reader["player_id"]);
+            TeamID = Convert.ToInt32(reader["team_id"]);
             Timestamp = Convert.ToDateTime(reader["timestamp"]);
 
             reader.Read();
@@ -276,7 +277,7 @@ namespace BT_Sport_Server.Opta
         {
             // Game node
             reader.Read();
-            HomeScore = Convert.ToInt32(reader["home_Score"]);
+            HomeScore = Convert.ToInt32(reader["home_score"]);
             AwayScore = Convert.ToInt32(reader["away_score"]);
             MatchID = Convert.ToInt32(reader["game_id"]);
 
@@ -285,10 +286,11 @@ namespace BT_Sport_Server.Opta
             EventID = Convert.ToInt64(reader["id"]);
             EventType = reader["event_type_name"];
             Timestamp = Convert.ToDateTime(reader["timestamp"]);
-            GoalType = reader["event_type_name"];
+            GoalType = EventType;
             Min = Convert.ToInt32(reader["period_minute"]);
             Sec = Convert.ToInt32(reader["period_second"]);
             Time = Min + 1;
+            TeamID = Convert.ToInt32(reader["team_id"]);
             Period = Match.ConvertPeriod(reader["period"]);
             PlayerScorerID = Convert.ToInt32(reader["player_id"]);
         }
