@@ -12,6 +12,15 @@ namespace BT_Sport_Server_Tests.Opta
         private readonly string filePath = "\\\\10.101.31.18\\FTP Data\\Processed\\TESTS\\";
 
         [TestMethod]
+        public void FootballDeleteMatchEventTests()
+        {
+            Deletion deletion = XmlHandler.DeserializeFile<Deletion>(filePath + "f50-8-2014-755628-113495906-deleted[20150409-111004].xml", new XmlRootAttribute { ElementName = "Live" });
+
+            Assert.AreEqual(755628, deletion.MatchID);
+            Assert.AreEqual(113495906, deletion.EventID);
+        }
+
+        [TestMethod]
         public void FootballGoalMatchEventTests()
         {
             Goal goal = XmlHandler.DeserializeFile<Goal>(filePath + "f50-98-2014-741613-1651683701-goal[20140908-012546].xml", new XmlRootAttribute { ElementName = "Live" });
@@ -80,6 +89,15 @@ namespace BT_Sport_Server_Tests.Opta
             Assert.AreEqual("yellow", card.CardType);
             Assert.AreEqual("foul", card.Reason);
             Assert.AreEqual(207760, card.PlayerID);
+        }
+
+        [TestMethod]
+        public void RugbyDeleteMatchEventTests()
+        {
+            Deletion deletion = XmlHandler.DeserializeFile<Deletion>(filePath + "RU50-242-2015-215701-3123689[20150405-132610].xml", new XmlRootAttribute { ElementName = "RU50_EventFeed" });
+
+            Assert.AreEqual(215701, deletion.MatchID);
+            Assert.AreEqual(3123689, deletion.EventID);
         }
 
         [TestMethod]
