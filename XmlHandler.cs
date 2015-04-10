@@ -18,34 +18,48 @@ namespace BT_Sport_Server
             return result;
         }
 
-        public static T DeserializeString<T>(string objectData)
+        public static T DeserializeString<T>(string xml)
         {
-            return (T)DeserializeString(objectData, typeof(T));
+            return (T) DeserializeString(xml, typeof(T));
         }
 
-        public static T DeserializeString<T>(string objectData, XmlRootAttribute rootAttribute)
+        public static T DeserializeString<T>(string xml, XmlRootAttribute rootAttribute)
         {
-            return (T)DeserializeString(objectData, typeof(T), rootAttribute);
+            return (T) DeserializeString(xml, typeof(T), rootAttribute);
         }
 
-        public static object DeserializeString(string objectData, Type type)
+        public static object DeserializeString(string xml, Type type)
         {
-            return Deserialize(new XmlSerializer(type), objectData);
+            return Deserialize(new XmlSerializer(type), xml);
         }
 
-        public static object DeserializeString(string objectData, Type type, XmlRootAttribute rootAttribute)
+        public static object DeserializeString(string xml, Type type, XmlRootAttribute rootAttribute)
         {
-            return Deserialize(new XmlSerializer(type, rootAttribute), objectData);
+            return Deserialize(new XmlSerializer(type, rootAttribute), xml);
         }
 
         public static T DeserializeFile<T>(string filePath)
         {
-            return (T)DeserializeString(new StreamReader(filePath).ReadToEnd(), typeof(T));
+            string text = String.Empty;
+
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                text = reader.ReadToEnd();
+            }
+
+            return (T) DeserializeString(text, typeof(T));
         }
 
         public static T DeserializeFile<T>(string filePath, XmlRootAttribute rootAttribute)
         {
-            return (T)DeserializeString(new StreamReader(filePath).ReadToEnd(), typeof(T), rootAttribute);
+            string text = String.Empty;
+
+            using (StreamReader reader = new StreamReader(filePath))
+            {
+                text = reader.ReadToEnd();
+            }
+
+            return (T) DeserializeString(text, typeof(T), rootAttribute);
         }
     }
 }
