@@ -7,6 +7,8 @@ namespace BT_Sport_Server.Opta
 {
     public abstract class MatchEvent : IXmlSerializable
     {
+        public string SportType { get; private set; }
+
         public long EventID { get; set; }
 
         public int MatchID { get; set; }
@@ -25,6 +27,8 @@ namespace BT_Sport_Server.Opta
 
         public DateTime Timestamp { get; set; }
 
+        public bool Valid { get; set; }
+
         protected MatchEvent()
         {
             EventType = String.Empty;
@@ -35,6 +39,8 @@ namespace BT_Sport_Server.Opta
         {
             return null;
         }
+
+        public abstract string UpdateMessage { get; }
 
         protected abstract void ReadFootballXml(XmlReader reader);
 
@@ -47,25 +53,57 @@ namespace BT_Sport_Server.Opta
             switch (reader.LocalName)
             {
                 case "Live":
-                {
-                    ReadFootballXml(reader);
-                    break;
-                }
+                    {
+                        SportType = "Soccer";
+                        ReadFootballXml(reader);
+                        Valid = true;
+                        break;
+                    }
                 case "RU50_EventFeed":
-                {
-                    ReadRugbyXml(reader);
-                    break;
-                }
+                    {
+                        SportType = "Rugby";
+                        ReadRugbyXml(reader);
+                        break;
+                    }
                 default:
-                {
-                    throw new NotImplementedException();
-                }
+                    {
+                        throw new NotImplementedException("Unexpected XML Feed");
+                    }
             }
         }
 
         public void WriteXml(XmlWriter writer)
         {
-            throw new NotImplementedException();
+            throw new NotImplementedException("Writing MatchEvents as XML is not supported. Move or create a copy of the file instead");
+        }
+    }
+
+    public class Deletion : MatchEvent
+    {
+        public override string UpdateMessage
+        {
+            get { return String.Format("UPDATESCORER|SOCCER|{0}|{1}|0|{1}|FORCEUPDATE", MatchID, EventID); }
+        }
+
+        protected override void ReadFootballXml(XmlReader reader)
+        {
+            reader.Read();
+            MatchID = Convert.ToInt32(reader["id"]);
+            reader.Read();
+            EventID = Convert.ToInt64(reader["id"]);
+        }
+
+        protected override void ReadRugbyXml(XmlReader reader)
+        {
+            reader.Read();
+            MatchID = Convert.ToInt32(reader["game_id"]);
+            reader.Read();
+            EventID = Convert.ToInt64(reader["id"]);
+        }
+
+        public override string ToString()
+        {
+            return String.Format("Deletion: {0} Match: {1}", EventType, MatchID);
         }
     }
 
@@ -80,6 +118,15 @@ namespace BT_Sport_Server.Opta
         public Substitution()
         {
             Reason = String.Empty;
+        }
+
+        public override string UpdateMessage
+        {
+            get
+            {
+                return String.Format("UPDATESUB|{0}|{1}|{2}|{3}|{4}|{5}", SportType.ToUpper(), MatchID, EventID,
+                    Timestamp, PlayerOnID, PlayerOffID);
+            }
         }
 
         protected override void ReadFootballXml(XmlReader reader)
@@ -123,6 +170,7 @@ namespace BT_Sport_Server.Opta
 
             // Event node
             reader.Read();
+            Valid = reader["outcome"] == "1";
             EventID = Convert.ToInt64(reader["id"]);
             Timestamp = Convert.ToDateTime(reader["timestamp"]);
             Period = Match.ConvertPeriod(reader["period"]);
@@ -141,6 +189,11 @@ namespace BT_Sport_Server.Opta
             reader.Read();
             Reason = reader["name"];
         }
+
+        public override string ToString()
+        {
+            return String.Format("Event: {0} Match: {1} Player On: {2} Player Off: {3}", EventID, MatchID, PlayerOnID, PlayerOffID);
+        }
     }
 
     public class Card : MatchEvent
@@ -156,7 +209,12 @@ namespace BT_Sport_Server.Opta
             Reason = String.Empty;
             CardType = String.Empty;
         }
-        
+
+        public override string UpdateMessage
+        {
+            get { return String.Format("UPDATECARD|{0}|{1}|{2}|{3}|{4}|{5}|", SportType.ToUpper(), MatchID, EventID, Time, PlayerID, CardType); }
+        }
+
         protected override void ReadFootballXml(XmlReader reader)
         {
             // Live node
@@ -194,6 +252,7 @@ namespace BT_Sport_Server.Opta
             MatchID = Convert.ToInt32(reader["game_id"]);
 
             reader.Read();
+            Valid = reader["outcome"] == "1";
             EventID = Convert.ToInt64(reader["id"]);
             EventType = reader["event_type_name"];
             Period = Match.ConvertPeriod(reader["period"]);
@@ -206,6 +265,11 @@ namespace BT_Sport_Server.Opta
 
             reader.Read();
             CardType = reader["name"];
+        }
+
+        public override string ToString()
+        {
+            return String.Format("Event: {0} Match: {1} Card: {2} Player: {3} Reason: {4}", EventID, MatchID, CardType, PlayerID, Reason);
         }
     }
 
@@ -225,7 +289,7 @@ namespace BT_Sport_Server.Opta
 
         public int HomeScore { get; set; }
 
-        public int AwayScore { get; set;}
+        public int AwayScore { get; set; }
 
         public Goal()
         {
@@ -234,8 +298,17 @@ namespace BT_Sport_Server.Opta
             ScoringRange = String.Empty;
         }
 
+        public override string UpdateMessage
+        {
+            get
+            {
+                return String.Format("UPDATESCORER|{0}|{1}|{2}|{3}|{4}|{5}|{6}", SportType.ToUpper(), MatchID, EventID,
+                    Timestamp, PlayerScorerID, GoalType, 0);
+            }
+        }
+
         protected override void ReadFootballXml(XmlReader reader)
-        { 
+        {
             // Live node
             Timestamp = Convert.ToDateTime(reader["timestamp"]);
 
@@ -283,6 +356,7 @@ namespace BT_Sport_Server.Opta
 
             // Event node
             reader.Read();
+            Valid = reader["outcome"] == "1";
             EventID = Convert.ToInt64(reader["id"]);
             EventType = reader["event_type_name"];
             Timestamp = Convert.ToDateTime(reader["timestamp"]);
@@ -293,6 +367,12 @@ namespace BT_Sport_Server.Opta
             TeamID = Convert.ToInt32(reader["team_id"]);
             Period = Match.ConvertPeriod(reader["period"]);
             PlayerScorerID = Convert.ToInt32(reader["player_id"]);
+        }
+
+        public override string ToString()
+        {
+            return String.Format("Event: {0} Match: {1} Player: {2} Score: {3} - {4} Goal Type: {5}", EventID, MatchID,
+                PlayerScorerID, HomeScore, AwayScore, GoalType);
         }
     }
 }
